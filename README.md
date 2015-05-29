@@ -4,7 +4,7 @@ A `<Popover>` component for react-native. This is still very much a work
 in progress and only handles the simplest of cases, ideas and
 contributions are very welcome.
 
-![Demo](https://raw.githubusercontent.com/jeanregisser/react-native-popover/Screenshots/basic.png)
+![Demo](https://raw.githubusercontent.com/jeanregisser/react-native-popover/master/Screenshots/basic.png)
 
 ## Usage
 
