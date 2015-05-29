@@ -1,0 +1,22 @@
+{
+  "name": "react-native-popover",
+  "version": "0.0.1",
+  "description": "A <Popover /> component for react-native",
+  "main": "Popover.js",
+  "author": "Jean Regisser <jean.regisser@gmail.com> (https://github.com/jeanregisser)",
+  "keywords": [
+    "popover",
+    "modal"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "start": "node_modules/react-native/packager/packager.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:jeanregisser/react-native-popover.git"
+  },
+  "dependencies": {
+    "react-native": "^0.4.4"
+  }
+}
