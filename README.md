@@ -6,6 +6,12 @@ contributions are very welcome.
 
 ![Demo](https://raw.githubusercontent.com/jeanregisser/react-native-popover/master/Screenshots/basic.gif)
 
+## Install
+
+```shell
+npm i --save react-native-popover
+```
+
 ## Usage
 
 ```javascript
