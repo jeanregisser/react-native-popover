@@ -167,10 +167,11 @@ var Popover = React.createClass({
       var {popoverOrigin, arrowOrigin, placement} = this.computeGeometry();
       var arrowColor = StyleSheetRegistry.getStyleByID(styles.content).backgroundColor;
       var arrowColorStyle = this.getArrowColorStyle(placement, arrowColor);
+      var contentSizeAvailable = this.state.contentSize.width;
 
       return (
         <TouchableWithoutFeedback onPress={this.props.onClose}>
-          <View style={styles.container}>
+          <View style={[styles.container, contentSizeAvailable && styles.containerVisible ]}>
             <View style={[styles.popover, {
               top: popoverOrigin.y,
               left: popoverOrigin.x,
@@ -195,6 +196,7 @@ var Popover = React.createClass({
 
 var DefaultStyles = StyleSheet.create({
   container: {
+    opacity: 0,
     top: 0,
     bottom: 0,
     left: 0,
@@ -202,6 +204,9 @@ var DefaultStyles = StyleSheet.create({
     position: 'absolute',
     justifyContent: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  containerVisible: {
+    opacity: 1,
   },
   popover: { 
     backgroundColor: 'transparent',
