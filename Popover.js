@@ -107,8 +107,6 @@ var Popover = React.createClass({
         Math.max(displayArea.y, fromRect.y + (fromRect.height - contentSize.height) / 2)));
     var arrowOrigin = new Point(contentSize.width, fromRect.y - popoverOrigin.y + (fromRect.height - 10) / 2.0);
 
-    console.log(popoverOrigin.x);
-
     return {
       popoverOrigin: popoverOrigin,
       arrowOrigin: arrowOrigin,
