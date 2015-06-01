@@ -50,19 +50,19 @@ var PopoverExample = React.createClass({
       <View style={styles.container}>
         <View style={styles.grid}>
           <View style={styles.row}>
-            {this.renderButton('Top Left', 'button1')}
-            {this.renderButton('Top Center', 'button2')}
-            {this.renderButton('Top Right', 'button3')}
+            {this.renderButton('TL', 'button1')}
+            {this.renderButton('T', 'button2')}
+            {this.renderButton('TR', 'button3')}
           </View>
           <View style={styles.row}>
-            {this.renderButton('Center Left', 'button4')}
-            {this.renderButton('Center', 'button5')}
-            {this.renderButton('Center Right', 'button6')}
+            {this.renderButton('L', 'button4')}
+            {this.renderButton('C', 'button5')}
+            {this.renderButton('R', 'button6')}
           </View>
           <View style={styles.row}>
-            {this.renderButton('Bottom Left', 'button7')}
-            {this.renderButton('Bottom Center', 'button8')}
-            {this.renderButton('Bottm Right', 'button9')}
+            {this.renderButton('BL', 'button7')}
+            {this.renderButton('B', 'button8')}
+            {this.renderButton('BR', 'button9')}
           </View>
         </View>
         <Popover
@@ -70,10 +70,9 @@ var PopoverExample = React.createClass({
             fromRect={this.state.buttonRect}
             displayArea={displayArea}
             onClose={this.closePopover}>
-            <Text>I'm the content of this popover!</Text>
-            <Text>Line 1</Text>
-            <Text>Line 2</Text>
-            <Text>Line 2</Text>
+            <View style={styles.popoverContent}>
+              <Text style={styles.popoverText}>Content</Text>
+            </View>
           </Popover>
       </View>
     );
@@ -99,13 +98,22 @@ var styles = StyleSheet.create({
     borderRadius: 4,
     padding: 10,
     margin: 10,
-    backgroundColor: '#ccc',
-    borderColor: '#333',
-    borderWidth: 1,
+    backgroundColor: 'white',
+    opacity: 0.8,
   },
   buttonText: {
-    fontSize: 10
-  }
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  popoverContent: {
+    width: 200,
+    height: 70,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  popoverText: {
+    color: '#ccc',
+  },
 });
 
 AppRegistry.registerComponent('PopoverExample', () => PopoverExample);
