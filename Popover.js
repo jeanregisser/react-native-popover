@@ -100,15 +100,15 @@ var DefaultStyles = StyleSheet.create({
     right: 0,
     position: 'absolute',
     justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  popover: { 
     backgroundColor: 'transparent',
+    position: 'absolute',
     shadowColor: 'black',
     shadowOffset: {width: 0, height: 2},
     shadowRadius: 2,
     shadowOpacity: 0.8,
-  },
-  popover: { 
-    //backgroundColor: 'red',
-    position: 'absolute',
   },
   content: {
     //margin: 10,
