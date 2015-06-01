@@ -5,7 +5,7 @@ var {
   PropTypes,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  TouchableWithoutFeedback,
   View
 } = React;
 var StyleSheetRegistry = require('StyleSheetRegistry');
@@ -169,7 +169,7 @@ var Popover = React.createClass({
       var arrowColorStyle = this.getArrowColorStyle(placement, arrowColor);
 
       return (
-        <TouchableOpacity onPress={this.props.onClose}>
+        <TouchableWithoutFeedback onPress={this.props.onClose}>
           <View style={styles.container}>
             <View style={[styles.popover, {
               top: popoverOrigin.y,
@@ -184,7 +184,7 @@ var Popover = React.createClass({
               </View>
             </View>
           </View>
-        </TouchableOpacity>
+        </TouchableWithoutFeedback>
       );
     } else {
       return (<View/>);
