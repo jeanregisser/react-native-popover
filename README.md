@@ -97,6 +97,18 @@ See [facebook/react-native#131](https://github.com/facebook/react-native/issues/
 
 However, as an alternative, I recommend you use [@brentvatne](https://github.com/brentvatne)'s [react-native-overlay](https://github.com/brentvatne/react-native-overlay) library to wrap `<Popover />` and bring it to the front no matter where it sits in the render tree.
 
+## Props
+
+Prop            | Type     | Optional | Default     | Description
+--------------- | -------- | -------- | ----------- | -----------
+isVisible       | bool     | Yes      | false       | Show/Hide the popover
+fromRect        | rect     | No       | {}          | Rectangle at which to anchor the popover
+displayArea     | rect     | Yes      | screen rect | Area where the popover is allowed to be displayed
+placement       | string   | Yes      | 'auto'      | How to position the popover - top &#124; bottom &#124; left &#124; right &#124; auto. When 'auto' is specified, it will determine the ideal placement so that the popover is fully visible within `displayArea`.
+onClose         | function | Yes      |             | Callback to be fired when the user taps the popover
+
+rect is an object with the following properties: `{x: number, y: number, width: number, height: number}`
+
 ---
 
 **MIT Licensed**
