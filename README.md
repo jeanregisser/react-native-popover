@@ -36,21 +36,16 @@ var PopoverExample = React.createClass({
   },
 
   showPopover() {
-    this.setState({isVisible: true});
+    this.refs.button.measure((ox, oy, width, height, px, py) => {
+      this.setState({
+        isVisible: true,
+        buttonRect: {x: px, y: py, width: width, height: height}
+      });
+    });
   },
 
   closePopover() {
     this.setState({isVisible: false});
-  },
-
-  componentDidMount() {
-    setTimeout(this.measureButton);
-  },
-
-  measureButton() {
-    this.refs.button.measure((ox, oy, width, height) => {
-      this.setState({buttonRect: {x: ox, y: oy, width: width, height: height}});
-    });
   },
 
   render() {
