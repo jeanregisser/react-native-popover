@@ -9,6 +9,7 @@ var {
   View
 } = React;
 var StyleSheetRegistry = require('StyleSheetRegistry');
+var Transitions = require('./Transitions');
 var noop = () => {};
 
 var SCREEN_HEIGHT = require('Dimensions').get('window').height;
@@ -27,6 +28,7 @@ function Rect(x, y, width, height) {
 }
 
 var Popover = React.createClass({
+  mixins: [Transitions.Mixin],
   propTypes: {
     isVisible: PropTypes.bool,
     onClose: PropTypes.func,
@@ -160,36 +162,71 @@ var Popover = React.createClass({
         return { borderRightColor: color };
     }
   },
+  componentWillReceiveProps(nextProps:any) {
+    var willBeVisible = nextProps.isVisible;
+    var {
+      isVisible,
+      customShowHandler,
+      customHideHandler,
+    } = this.props;
+
+    if (willBeVisible !== isVisible) {
+      var animDuration = 300;
+      var defaultShowHandler = (t) => {
+        var easing = Transitions.Easings.easeInOutQuad;
+        t('background.opacity', {duration: animDuration, easing: easing, begin: 0, end: 1,});
+        t('popover.transform.translateX', {duration: animDuration, easing: easing, begin: 111, end: 0,});
+        t('popover.transform.translateY', {duration: animDuration, easing: easing, begin: 0, end: 0,});
+        t('popover.transform.scaleXY', {duration: animDuration, easing: easing, begin: 0, end: 1,});
+      }
+      var defaultHideHandler = (t) => {
+        var easing = Transitions.Easings.easeInOutQuad;
+        t('background.opacity', {duration: animDuration, easing: easing, end: 0,});
+        t('popover.transform.scaleXY', {duration: animDuration, easing: easing, end: 0,});
+        t('popover.transform.translateX', {duration: animDuration, easing: easing, end: 111,});
+        t('popover.transform.translateY', {duration: animDuration, easing: easing, end: 0,});
+      }
+
+      if (willBeVisible) {
+        var showHandler = customShowHandler || defaultShowHandler;
+        showHandler(this.transition);
+      } else {
+        var hideHandler = customHideHandler || defaultHideHandler;
+        hideHandler(this.transition);
+      }
+    }
+  },
   render() {
     var styles = this.props.style || DefaultStyles;
 
-    if (this.props.isVisible) {
-      var {popoverOrigin, arrowOrigin, placement} = this.computeGeometry();
-      var arrowColor = StyleSheetRegistry.getStyleByID(styles.content).backgroundColor;
-      var arrowColorStyle = this.getArrowColorStyle(placement, arrowColor);
-      var contentSizeAvailable = this.state.contentSize.width;
+    if (!this.props.isVisible && !this.state.isTransitioning) {
+        return <View />;
+    }
 
-      return (
-        <TouchableWithoutFeedback onPress={this.props.onClose}>
-          <View style={[styles.container, contentSizeAvailable && styles.containerVisible ]}>
-            <View style={[styles.popover, {
-              top: popoverOrigin.y,
-              left: popoverOrigin.x,
-              }]}>
-              <View style={[styles.arrow, arrowColorStyle, {
-                top: arrowOrigin.y,
-                left: arrowOrigin.x,
-                }]}/>
-              <View ref='content' onLayout={this.measureContent} style={styles.content}>
-                {React.Children.map(this.props.children, React.addons.cloneWithProps)}
-              </View>
+    var {popoverOrigin, arrowOrigin, placement} = this.computeGeometry();
+    var arrowColor = StyleSheetRegistry.getStyleByID(styles.content).backgroundColor;
+    var arrowColorStyle = this.getArrowColorStyle(placement, arrowColor);
+    var contentSizeAvailable = this.state.contentSize.width;
+
+    return (
+      <TouchableWithoutFeedback onPress={this.props.onClose}>
+        <View style={[styles.container, contentSizeAvailable && styles.containerVisible ]}>
+          <View style={[styles.background, this.transitionStyles('background')]}/>
+          <View style={[styles.popover, {
+            top: popoverOrigin.y,
+            left: popoverOrigin.x,
+            }, this.transitionStyles('popover')]}>
+            <View style={[styles.arrow, arrowColorStyle, {
+              top: arrowOrigin.y,
+              left: arrowOrigin.x,
+              }]}/>
+            <View ref='content' onLayout={this.measureContent} style={styles.content}>
+              {React.Children.map(this.props.children, React.addons.cloneWithProps)}
             </View>
           </View>
-        </TouchableWithoutFeedback>
-      );
-    } else {
-      return (<View/>);
-    }
+        </View>
+      </TouchableWithoutFeedback>
+    );
   }
 });
 
@@ -202,11 +239,18 @@ var DefaultStyles = StyleSheet.create({
     left: 0,
     right: 0,
     position: 'absolute',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'transparent',
   },
   containerVisible: {
     opacity: 1,
+  },
+  background: {
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    position: 'absolute',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   popover: { 
     backgroundColor: 'transparent',
