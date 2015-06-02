@@ -89,6 +89,14 @@ var styles = StyleSheet.create({
 AppRegistry.registerComponent('PopoverExample', () => PopoverExample);
 ```
 
+### Displaying the popover on top of other elements
+
+React Native doesn't support directly setting a zIndex on a view.
+What is recommended instead is to rearrange your view hierarchy and put the popover last at the root of your app.
+See [facebook/react-native#131](https://github.com/facebook/react-native/issues/131#issuecomment-77764928)
+
+However, as an alternative, I recommend you use [@brentvatne](https://github.com/brentvatne)'s [react-native-overlay](https://github.com/brentvatne/react-native-overlay) library to wrap `<Popover />` and bring it to the front no matter where it sits in the render tree.
+
 ---
 
 **MIT Licensed**
