@@ -137,7 +137,8 @@ var Popover = React.createClass({
   computeAutoGeometry({displayArea, fromRect, contentSize}) {
     var placementsToTry = ['left', 'right', 'bottom', 'top'];
 
-    for(var placement of placementsToTry) {
+    for (var i = 0; i < placementsToTry.length; i++) {
+      var placement = placementsToTry[i];
       var geom = this.computeGeometry({contentSize: contentSize, placement: placement});
       var {popoverOrigin} = geom;
 
