@@ -4,7 +4,7 @@ A `<Popover>` component for react-native. This is still very much a work
 in progress and only handles the simplest of cases, ideas and
 contributions are very welcome.
 
-![Demo](https://raw.githubusercontent.com/jeanregisser/react-native-popover/master/Screenshots/basic.gif)
+![Demo](https://raw.githubusercontent.com/jeanregisser/react-native-popover/master/Screenshots/animated.gif)
 
 ## Install
 
@@ -99,15 +99,21 @@ However, as an alternative, I recommend you use [@brentvatne](https://github.com
 
 ## Props
 
-Prop            | Type     | Optional | Default     | Description
---------------- | -------- | -------- | ----------- | -----------
-isVisible       | bool     | Yes      | false       | Show/Hide the popover
-fromRect        | rect     | No       | {}          | Rectangle at which to anchor the popover
-displayArea     | rect     | Yes      | screen rect | Area where the popover is allowed to be displayed
-placement       | string   | Yes      | 'auto'      | How to position the popover - top &#124; bottom &#124; left &#124; right &#124; auto. When 'auto' is specified, it will determine the ideal placement so that the popover is fully visible within `displayArea`.
-onClose         | function | Yes      |             | Callback to be fired when the user taps the popover
+Prop              | Type     | Optional | Default     | Description
+----------------- | -------- | -------- | ----------- | -----------
+isVisible         | bool     | Yes      | false       | Show/Hide the popover
+fromRect          | rect     | No       | {}          | Rectangle at which to anchor the popover
+displayArea       | rect     | Yes      | screen rect | Area where the popover is allowed to be displayed
+placement         | string   | Yes      | 'auto'      | How to position the popover - top &#124; bottom &#124; left &#124; right &#124; auto. When 'auto' is specified, it will determine the ideal placement so that the popover is fully visible within `displayArea`.
+onClose           | function | Yes      |             | Callback to be fired when the user taps the popover
+customShowHandler | function | Yes      |             | Custom show animation handler - uses a [react-tween-state wrapper](https://github.com/jeanregisser/react-native-popover/blob/master/Transition.js) API in order to show the modal. See example.
+customHideHandler | function | Yes      |             | Custom hide animation handler - uses a [react-tween-state wrapper](https://github.com/jeanregisser/react-native-popover/blob/master/Transition.js) API in order to hide the modal. See example.
 
 rect is an object with the following properties: `{x: number, y: number, width: number, height: number}`
+
+## Credits
+
+The code supporting animations was inspired and adapted from [@brentvatne](https://github.com/brentvatne)'s [Transition.js mixin](https://github.com/brentvatne/react-native-modal/blob/8020a920e7f08a0f1acd6ce897fe888fa39a51bf/Transitions.js).
 
 ---
 
