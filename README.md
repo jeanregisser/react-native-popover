@@ -99,13 +99,15 @@ However, as an alternative, I recommend you use [@brentvatne](https://github.com
 
 ## Props
 
-Prop            | Type     | Optional | Default     | Description
---------------- | -------- | -------- | ----------- | -----------
-isVisible       | bool     | Yes      | false       | Show/Hide the popover
-fromRect        | rect     | No       | {}          | Rectangle at which to anchor the popover
-displayArea     | rect     | Yes      | screen rect | Area where the popover is allowed to be displayed
-placement       | string   | Yes      | 'auto'      | How to position the popover - top &#124; bottom &#124; left &#124; right &#124; auto. When 'auto' is specified, it will determine the ideal placement so that the popover is fully visible within `displayArea`.
-onClose         | function | Yes      |             | Callback to be fired when the user taps the popover
+Prop              | Type     | Optional | Default     | Description
+----------------- | -------- | -------- | ----------- | -----------
+isVisible         | bool     | Yes      | false       | Show/Hide the popover
+fromRect          | rect     | No       | {}          | Rectangle at which to anchor the popover
+displayArea       | rect     | Yes      | screen rect | Area where the popover is allowed to be displayed
+placement         | string   | Yes      | 'auto'      | How to position the popover - top &#124; bottom &#124; left &#124; right &#124; auto. When 'auto' is specified, it will determine the ideal placement so that the popover is fully visible within `displayArea`.
+onClose           | function | Yes      |             | Callback to be fired when the user taps the popover
+customShowHandler | function | Yes      |             | Custom show animation handler - uses a [react-tween-state wrapper](https://github.com/jeanregisser/react-native-popover/blob/master/Transition.js) API in order to show the modal. See example.
+customHideHandler | function | Yes      |             | Custom hide animation handler - uses a [react-tween-state wrapper](https://github.com/jeanregisser/react-native-popover/blob/master/Transition.js) API in order to hide the modal. See example.
 
 rect is an object with the following properties: `{x: number, y: number, width: number, height: number}`
 
