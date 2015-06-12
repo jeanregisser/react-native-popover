@@ -53,10 +53,13 @@ var Popover = React.createClass({
     var {width, height} = x.nativeEvent.layout;
     var contentSize = {width: width, height: height};
     var geom = this.computeGeometry({contentSize: contentSize});
-    this.setState(Object.assign(geom, {contentSize: contentSize}), () => {
+
+    var awaitingShowHandler = this.state.awaitingShowHandler;
+    this.setState(Object.assign(geom, 
+      {contentSize: contentSize, awaitingShowHandler: undefined}), () => {
       // Once state is set, call the showHandler so it can access all the geometry
       // from the state
-      this.state.delayedShowHandler(this.transition);
+      awaitingShowHandler && awaitingShowHandler(this.transition);
     });
   },
   computeGeometry({contentSize, placement}) {
@@ -197,7 +200,9 @@ var Popover = React.createClass({
 
       if (willBeVisible) {
         var showHandler = customShowHandler || defaultShowHandler;
-        this.setState({contentSize: {}, delayedShowHandler: showHandler});
+        // We want to call the showHandler only when contentSize is known
+        // so that it can have logic depending on the geometry
+        this.setState({contentSize: {}, awaitingShowHandler: showHandler});
       } else {
         var hideHandler = customHideHandler || defaultHideHandler;
         hideHandler(this.transition);
