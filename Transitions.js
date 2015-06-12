@@ -1,3 +1,5 @@
+// Adapted from https://github.com/brentvatne/react-native-modal/blob/8020a920e7f08a0f1acd6ce897fe888fa39a51bf/Transitions.js
+// so it can be used on transform properties
 'use strict';
 
 var { Mixin, easingTypes } = require('react-tween-state');

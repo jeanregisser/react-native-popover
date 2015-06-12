@@ -109,6 +109,10 @@ onClose         | function | Yes      |             | Callback to be fired when 
 
 rect is an object with the following properties: `{x: number, y: number, width: number, height: number}`
 
+## Credits
+
+The code supporting animations was inspired and adapted from [@brentvatne](https://github.com/brentvatne)'s [Transition.js mixin](https://github.com/brentvatne/react-native-modal/blob/8020a920e7f08a0f1acd6ce897fe888fa39a51bf/Transitions.js).
+
 ---
 
 **MIT Licensed**
