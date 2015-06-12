@@ -179,7 +179,7 @@ var Popover = React.createClass({
         return new Point(arrowTip.x - popoverCenter.x, arrowTip.y - popoverCenter.y);
       }
       var defaultShowHandler = (t) => {
-        var easing = Transitions.Easings.easeInOutQuad;
+        var easing = Transitions.Easings.easeOutBack;
         var translateOrigin = getTranslateOrigin();
         t('background.opacity', {duration: animDuration, easing: easing, begin: 0, end: 1,});
         t('popover.transform.translateX', {duration: animDuration, easing: easing, begin: translateOrigin.x, end: 0,});
