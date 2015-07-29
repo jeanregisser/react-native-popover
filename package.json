@@ -1,10 +1,14 @@
 {
   "name": "react-native-popover",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A <Popover /> component for react-native",
   "main": "Popover.js",
   "author": "Jean Regisser <jean.regisser@gmail.com> (https://github.com/jeanregisser)",
   "keywords": [
+    "react-component",
+    "react-native",
+    "ios",
+    "ui",
     "popover",
     "modal"
   ],
@@ -16,10 +20,7 @@
     "type": "git",
     "url": "git@github.com:jeanregisser/react-native-popover.git"
   },
-  "dependencies": {
-    "react-tween-state": "0.0.5"
-  },
   "peerDependencies": {
-    "react-native": ">=0.4.4"
+    "react-native": ">=0.8.0"
   }
 }

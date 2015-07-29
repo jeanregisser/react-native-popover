@@ -4,16 +4,18 @@ var React = require('react-native');
 var {
   PropTypes,
   StyleSheet,
+  Dimensions,
+  Animated,
   Text,
   TouchableWithoutFeedback,
   View
 } = React;
-var StyleSheetRegistry = require('StyleSheetRegistry');
-var Transitions = require('./Transitions');
+var flattenStyle = require('react-native/Libraries/StyleSheet/flattenStyle');
+var Easing = require('react-native/Libraries/Animation/Animated/Easing');
 var noop = () => {};
 
-var SCREEN_HEIGHT = require('Dimensions').get('window').height;
-var SCREEN_WIDTH = require('Dimensions').get('window').width;
+var SCREEN_HEIGHT = Dimensions.get('window').height;
+var SCREEN_WIDTH = Dimensions.get('window').width;
 
 function Point(x, y) {
   this.x = x;
@@ -28,7 +30,6 @@ function Rect(x, y, width, height) {
 }
 
 var Popover = React.createClass({
-  mixins: [Transitions.Mixin],
   propTypes: {
     isVisible: PropTypes.bool,
     onClose: PropTypes.func,
@@ -39,6 +40,10 @@ var Popover = React.createClass({
       popoverOrigin: {},
       arrowOrigin: {},
       placement: 'auto',
+      isTransitioning: false,
+      transform: new Animated.Value(0),
+      translate: new Animated.ValueXY(),
+      fade: new Animated.Value(0),
     };
   },
   getDefaultProps() {
@@ -59,7 +64,7 @@ var Popover = React.createClass({
       {contentSize: contentSize, awaitingShowHandler: undefined}), () => {
       // Once state is set, call the showHandler so it can access all the geometry
       // from the state
-      awaitingShowHandler && awaitingShowHandler(this.transition);
+      awaitingShowHandler && awaitingShowHandler();
     });
   },
   computeGeometry({contentSize, placement}) {
@@ -182,21 +187,73 @@ var Popover = React.createClass({
           popoverOrigin.y + arrowOrigin.y + 5);
         return new Point(arrowTip.x - popoverCenter.x, arrowTip.y - popoverCenter.y);
       }
+      var config = {velocity: 3, bounciness: 18};
       var defaultShowHandler = (t) => {
-        var easing = Transitions.Easings.easeOutBack;
+        /*var easing = Transitions.Easings.easeOutBack;
         var translateOrigin = getTranslateOrigin();
         t('background.opacity', {duration: animDuration, easing: easing, begin: 0, end: 1,});
         t('popover.transform.translateX', {duration: animDuration, easing: easing, begin: translateOrigin.x, end: 0,});
         t('popover.transform.translateY', {duration: animDuration, easing: easing, begin: translateOrigin.y, end: 0,});
-        t('popover.transform.scaleXY', {duration: animDuration, easing: easing, begin: 0, end: 1,});
+        t('popover.transform.scaleXY', {duration: animDuration, easing: easing, begin: 0, end: 1,});*/
+
+        var translateOrigin = getTranslateOrigin();
+        this.state.translate.setValue(translateOrigin);
+
+        var commonConfig = {
+          duration: animDuration,
+          easing: Easing.out(Easing.back()),
+        }
+        
+        Animated.parallel([
+          Animated.timing(this.state.fade, {
+            toValue: 1,
+            ...commonConfig,
+          }),
+          Animated.timing(this.state.translate, {
+            toValue: new Point(0, 0),
+            ...commonConfig,
+          }),
+          Animated.timing(this.state.transform, {
+            toValue: 1,
+            ...commonConfig,
+          })
+        ]).start();
       }
       var defaultHideHandler = (t) => {
-        var easing = Transitions.Easings.easeInOutQuad;
+        /*var easing = Transitions.Easings.easeInOutQuad;
         var translateOrigin = getTranslateOrigin();
         t('background.opacity', {duration: animDuration, easing: easing, end: 0,});
         t('popover.transform.scaleXY', {duration: animDuration, easing: easing, end: 0,});
         t('popover.transform.translateX', {duration: animDuration, easing: easing, end: translateOrigin.x,});
         t('popover.transform.translateY', {duration: animDuration, easing: easing, end: translateOrigin.y,});
+        */
+       
+        var commonConfig = {
+          duration: animDuration,
+          easing: Easing.inOut(Easing.quad),
+        }
+       
+        var translateOrigin = getTranslateOrigin();
+
+        this.setState({isTransitioning: true});
+
+        Animated.parallel([
+          Animated.timing(this.state.fade, {
+            toValue: 0,
+            ...commonConfig,
+          }),
+          Animated.timing(this.state.translate, {
+            toValue: translateOrigin,
+            ...commonConfig,
+          }),
+          Animated.timing(this.state.transform, {
+            toValue: 0,
+            ...commonConfig,
+          }),
+        ]).start(({finished}) => {
+          console.log('--- finished:', finished);
+          this.setState({isTransitioning: false});
+        });
       }
 
       if (willBeVisible) {
@@ -206,7 +263,7 @@ var Popover = React.createClass({
         this.setState({contentSize: {}, awaitingShowHandler: showHandler});
       } else {
         var hideHandler = customHideHandler || defaultHideHandler;
-        hideHandler(this.transition);
+        hideHandler();
       }
     }
   },
@@ -214,30 +271,42 @@ var Popover = React.createClass({
     var styles = this.props.style || DefaultStyles;
 
     if (!this.props.isVisible && !this.state.isTransitioning) {
-        return <View />;
+        return null;
     }
 
     var {popoverOrigin, arrowOrigin, placement} = this.state;
-    var arrowColor = StyleSheetRegistry.getStyleByID(styles.content).backgroundColor;
+    var arrowColor = flattenStyle(styles.content).backgroundColor;
     var arrowColorStyle = this.getArrowColorStyle(placement, arrowColor);
     var contentSizeAvailable = this.state.contentSize.width;
+
+    var backgroundAnimatedStyle = {
+      opacity: this.state.fade,
+    };
+
+    var popoverAnimatedStyle = {
+      transform: [
+        {translateX: this.state.translate.x},
+        {translateY: this.state.translate.y},
+        {scale: this.state.transform},
+      ],
+    };
 
     return (
       <TouchableWithoutFeedback onPress={this.props.onClose}>
         <View style={[styles.container, contentSizeAvailable && styles.containerVisible ]}>
-          <View style={[styles.background, this.transitionStyles('background')]}/>
-          <View style={[styles.popover, {
+          <Animated.View style={[styles.background, backgroundAnimatedStyle /*, this.transitionStyles('background')*/]}/>
+          <Animated.View style={[styles.popover, {
             top: popoverOrigin.y,
             left: popoverOrigin.x,
-            }, this.transitionStyles('popover')]}>
+            }, popoverAnimatedStyle /*, this.transitionStyles('popover')*/]}>
             <View style={[styles.arrow, arrowColorStyle, {
               top: arrowOrigin.y,
               left: arrowOrigin.x,
               }]}/>
             <View ref='content' onLayout={this.measureContent} style={styles.content}>
-              {React.Children.map(this.props.children, React.addons.cloneWithProps)}
+              {this.props.children}
             </View>
-          </View>
+          </Animated.View>
         </View>
       </TouchableWithoutFeedback>
     );
@@ -285,13 +354,13 @@ var DefaultStyles = StyleSheet.create({
     width: 10,
     height: 10,
     borderTopWidth: 5,
-    borderTopColor: 'rgba(0,0,0,0)',
+    borderTopColor: 'transparent',
     borderRightWidth: 5,
-    borderRightColor: 'rgba(0,0,0,0)',
+    borderRightColor: 'transparent',
     borderBottomWidth: 5,
-    borderBottomColor: 'rgba(0,0,0,0)',
+    borderBottomColor: 'transparent',
     borderLeftWidth: 5,
-    borderLeftColor: 'rgba(0,0,0,0)',
+    borderLeftColor: 'transparent',
   },
 });
 

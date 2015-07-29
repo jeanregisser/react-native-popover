@@ -5,13 +5,11 @@ var Popover = require('../Popover');
 var {
   AppRegistry,
   StyleSheet,
+  Dimensions,
   Text,
   TouchableHighlight,
   View,
 } = React;
-
-var SCREEN_HEIGHT = require('Dimensions').get('window').height;
-var SCREEN_WIDTH = require('Dimensions').get('window').width;
 
 var PopoverExample = React.createClass({
   getInitialState() {
@@ -43,7 +41,7 @@ var PopoverExample = React.createClass({
   },
 
   render() {
-    var {width, height} = require('Dimensions').get('window');
+    var {width, height} = Dimensions.get('window');
     var displayArea = {x: 5, y: 20, width: width - 10, height: height - 25};
 
     return (
