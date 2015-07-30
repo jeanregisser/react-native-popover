@@ -45,7 +45,7 @@ var Popover = React.createClass({
       popoverOrigin: {},
       placement: 'auto',
       isTransitioning: false,
-      transform: new Animated.Value(0),
+      scale: new Animated.Value(0),
       translate: new Animated.ValueXY(),
       fade: new Animated.Value(0),
     };
@@ -211,7 +211,7 @@ var Popover = React.createClass({
 
     if (willBeVisible !== isVisible) {
       var animDuration = 300;
-      var config = {velocity: 3, bounciness: 18};
+
       var defaultShowHandler = (t) => {
         /*var easing = Transitions.Easings.easeOutBack;
         var translateOrigin = getTranslateOrigin();
@@ -237,7 +237,7 @@ var Popover = React.createClass({
             toValue: new Point(0, 0),
             ...commonConfig,
           }),
-          Animated.timing(this.state.transform, {
+          Animated.timing(this.state.scale, {
             toValue: 1,
             ...commonConfig,
           })
@@ -270,7 +270,7 @@ var Popover = React.createClass({
             toValue: translateOrigin,
             ...commonConfig,
           }),
-          Animated.timing(this.state.transform, {
+          Animated.timing(this.state.scale, {
             toValue: 0,
             ...commonConfig,
           }),
@@ -312,9 +312,21 @@ var Popover = React.createClass({
       transform: [
         {translateX: this.state.translate.x},
         {translateY: this.state.translate.y},
-        {scale: this.state.transform},
+        {scale: this.state.scale},
       ],
     };
+
+    var arrowAnimatedStyle = {
+      transform: [
+        {
+          scale: this.state.scale.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, 1],
+            extrapolate: 'clamp',
+          }),
+        },
+      ],
+    }
 
     return (
       <TouchableWithoutFeedback onPress={this.props.onClose}>
@@ -323,11 +335,11 @@ var Popover = React.createClass({
           <Animated.View style={[styles.popover, {
             top: popoverOrigin.y,
             left: popoverOrigin.x,
-            }, popoverAnimatedStyle /*, this.transitionStyles('popover')*/]}>
-            <View style={[styles.arrow, arrowDynamicStyle, arrowColorStyle]}/>
-            <View ref='content' onLayout={this.measureContent} style={styles.content}>
+            } /*, this.transitionStyles('popover')*/]}>
+            <Animated.View style={[styles.arrow, arrowDynamicStyle, arrowColorStyle, arrowAnimatedStyle]}/>
+            <Animated.View ref='content' onLayout={this.measureContent} style={[styles.content, popoverAnimatedStyle]}>
               {this.props.children}
-            </View>
+            </Animated.View>
           </Animated.View>
         </View>
       </TouchableWithoutFeedback>
