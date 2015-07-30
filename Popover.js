@@ -179,6 +179,11 @@ var Popover = React.createClass({
     var {width, height} = this.props.arrowSize;
     var {anchorPoint, popoverOrigin} = this.state;
 
+    // Make it slightly bigger
+    // to fix a visual artifact when the popover is animated with a scale
+    width += 1;
+    height += 1;
+
     return {
       left: anchorPoint.x - popoverOrigin.x - width,
       top: anchorPoint.y - popoverOrigin.y - height,
