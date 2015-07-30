@@ -15,6 +15,7 @@ var Easing = require('react-native/Libraries/Animation/Animated/Easing');
 var noop = () => {};
 
 var {height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
+var DEFAULT_ARROW_SIZE = new Size(10, 5);
 
 function Point(x, y) {
   this.x = x;
@@ -54,7 +55,7 @@ var Popover = React.createClass({
     return {
       isVisible: false,
       displayArea: new Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT),
-      arrowSize: new Size(5, 5),
+      arrowSize: DEFAULT_ARROW_SIZE,
       placement: 'auto',
       onClose: noop,
     };
@@ -78,7 +79,7 @@ var Popover = React.createClass({
     var options = {
       displayArea: this.props.displayArea,
       fromRect: this.props.fromRect,
-      arrowSize: this.props.arrowSize,
+      arrowSize: this.getArrowSize(placement),
       contentSize,
     }
 
@@ -163,36 +164,51 @@ var Popover = React.createClass({
 
     return geom;
   },
-  getArrowColorStyle(placement, color) {
-    switch (placement) {
-      case 'top':
-        return { borderTopColor: color };
-      case 'bottom':
-        return { borderBottomColor: color };
+  getArrowSize(placement) {
+    var size = this.props.arrowSize;
+    switch(placement) {
       case 'left':
-        return { borderLeftColor: color };
       case 'right':
-        return { borderRightColor: color };
+        return new Size(size.height, size.width);
+      default:
+        return size;
+    }
+  },
+  getArrowColorStyle(color) {
+    return { borderTopColor: color };
+  },
+  getArrowRotation(placement) {
+    switch (placement) {
+      case 'bottom':
+        return '180deg';
+      case 'left':
+        return '-90deg';
+      case 'right':
+        return '90deg';
+      default:
+        return '0deg';
     }
   },
   getArrowDynamicStyle() {
-    var {width, height} = this.props.arrowSize;
     var {anchorPoint, popoverOrigin} = this.state;
+    var arrowSize = this.props.arrowSize;
 
-    // Make it slightly bigger
+    // Create the arrow from a rectangle with the appropriate borderXWidth set
+    // A rotation is then applied dependending on the placement
+    // Also make it slightly bigger
     // to fix a visual artifact when the popover is animated with a scale
-    width += 1;
-    height += 1;
+    var width = arrowSize.width + 2;
+    var height = arrowSize.height * 2 + 2;
 
     return {
-      left: anchorPoint.x - popoverOrigin.x - width,
-      top: anchorPoint.y - popoverOrigin.y - height,
-      width: width * 2,
-      height: height * 2,
-      borderTopWidth: height,
-      borderRightWidth: width,
-      borderBottomWidth: height,
-      borderLeftWidth: width,
+      left: anchorPoint.x - popoverOrigin.x - width / 2,
+      top: anchorPoint.y - popoverOrigin.y - height / 2,
+      width: width,
+      height: height,
+      borderTopWidth: height / 2,
+      borderRightWidth: width / 2,
+      borderBottomWidth: height / 2,
+      borderLeftWidth: width / 2,
     }
   },
   getTranslateOrigin() {
@@ -300,7 +316,7 @@ var Popover = React.createClass({
 
     var {popoverOrigin, placement} = this.state;
     var arrowColor = flattenStyle(styles.content).backgroundColor;
-    var arrowColorStyle = this.getArrowColorStyle(placement, arrowColor);
+    var arrowColorStyle = this.getArrowColorStyle(arrowColor);
     var arrowDynamicStyle = this.getArrowDynamicStyle();
     var contentSizeAvailable = this.state.contentSize.width;
 
@@ -324,7 +340,9 @@ var Popover = React.createClass({
             outputRange: [0, 1],
             extrapolate: 'clamp',
           }),
-        },
+        }, {
+          rotate: this.getArrowRotation(placement),
+        }
       ],
     }
 
