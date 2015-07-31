@@ -46,9 +46,11 @@ var Popover = React.createClass({
       popoverOrigin: {},
       placement: 'auto',
       isTransitioning: false,
-      scale: new Animated.Value(0),
-      translate: new Animated.ValueXY(),
-      fade: new Animated.Value(0),
+      defaultAnimatedValues: {
+        scale: new Animated.Value(0),
+        translate: new Animated.ValueXY(),
+        fade: new Animated.Value(0),
+      },
     };
   },
   getDefaultProps() {
@@ -65,12 +67,12 @@ var Popover = React.createClass({
     var contentSize = {width, height};
     var geom = this.computeGeometry({contentSize});
 
-    var awaitingShowHandler = this.state.awaitingShowHandler;
+    var isAwaitingShow = this.state.isAwaitingShow;
     this.setState(Object.assign(geom,
-      {contentSize, awaitingShowHandler: undefined}), () => {
+      {contentSize, isAwaitingShow: undefined}), () => {
       // Once state is set, call the showHandler so it can access all the geometry
       // from the state
-      awaitingShowHandler && awaitingShowHandler();
+      isAwaitingShow && this._startAnimation({show: true});
     });
   },
   computeGeometry({contentSize, placement}) {
@@ -221,141 +223,136 @@ var Popover = React.createClass({
     var willBeVisible = nextProps.isVisible;
     var {
       isVisible,
-      customShowHandler,
-      customHideHandler,
     } = this.props;
 
     if (willBeVisible !== isVisible) {
-      var animDuration = 300;
-
-      var defaultShowHandler = (t) => {
-        /*var easing = Transitions.Easings.easeOutBack;
-        var translateOrigin = getTranslateOrigin();
-        t('background.opacity', {duration: animDuration, easing: easing, begin: 0, end: 1,});
-        t('popover.transform.translateX', {duration: animDuration, easing: easing, begin: translateOrigin.x, end: 0,});
-        t('popover.transform.translateY', {duration: animDuration, easing: easing, begin: translateOrigin.y, end: 0,});
-        t('popover.transform.scaleXY', {duration: animDuration, easing: easing, begin: 0, end: 1,});*/
-
-        var translateOrigin = this.getTranslateOrigin();
-        this.state.translate.setValue(translateOrigin);
-
-        var commonConfig = {
-          duration: animDuration,
-          easing: Easing.out(Easing.back()),
-        }
-
-        Animated.parallel([
-          Animated.timing(this.state.fade, {
-            toValue: 1,
-            ...commonConfig,
-          }),
-          Animated.timing(this.state.translate, {
-            toValue: new Point(0, 0),
-            ...commonConfig,
-          }),
-          Animated.timing(this.state.scale, {
-            toValue: 1,
-            ...commonConfig,
-          })
-        ]).start();
-      }
-      var defaultHideHandler = (t) => {
-        /*var easing = Transitions.Easings.easeInOutQuad;
-        var translateOrigin = getTranslateOrigin();
-        t('background.opacity', {duration: animDuration, easing: easing, end: 0,});
-        t('popover.transform.scaleXY', {duration: animDuration, easing: easing, end: 0,});
-        t('popover.transform.translateX', {duration: animDuration, easing: easing, end: translateOrigin.x,});
-        t('popover.transform.translateY', {duration: animDuration, easing: easing, end: translateOrigin.y,});
-        */
-
-        var commonConfig = {
-          duration: animDuration,
-          easing: Easing.inOut(Easing.quad),
-        }
-
-        var translateOrigin = this.getTranslateOrigin();
-
-        this.setState({isTransitioning: true});
-
-        Animated.parallel([
-          Animated.timing(this.state.fade, {
-            toValue: 0,
-            ...commonConfig,
-          }),
-          Animated.timing(this.state.translate, {
-            toValue: translateOrigin,
-            ...commonConfig,
-          }),
-          Animated.timing(this.state.scale, {
-            toValue: 0,
-            ...commonConfig,
-          }),
-        ]).start(({finished}) => {
-          console.log('--- finished:', finished);
-          this.setState({isTransitioning: false});
-        });
-      }
-
       if (willBeVisible) {
-        var showHandler = customShowHandler || defaultShowHandler;
-        // We want to call the showHandler only when contentSize is known
-        // so that it can have logic depending on the geometry
-        this.setState({contentSize: {}, awaitingShowHandler: showHandler});
+        // We want to start the show animation only when contentSize is known
+        // so that we can have some logic depending on the geometry
+        this.setState({contentSize: {}, isAwaitingShow: true});
       } else {
-        var hideHandler = customHideHandler || defaultHideHandler;
-        hideHandler();
+        this._startAnimation({show: false});
       }
     }
   },
-  render() {
-    var styles = this.props.style || DefaultStyles;
+  _startAnimation({show}) {
+    var handler = this.props.startCustomAnimation || this._startDefaultAnimation;
+    handler({show, doneCallback: () => this.setState({isTransitioning: false})});
+    this.setState({isTransitioning: true});
+  },
+  _startDefaultAnimation({show, doneCallback}) {
+    var animDuration = 300;
+    var values = this.state.defaultAnimatedValues;
+    var translateOrigin = this.getTranslateOrigin();
 
+    if (show) {
+      values.translate.setValue(translateOrigin);
+    }
+
+    var commonConfig = {
+      duration: animDuration,
+      easing: show ? Easing.out(Easing.back()) : Easing.inOut(Easing.quad),
+    }
+
+    Animated.parallel([
+      Animated.timing(values.fade, {
+        toValue: show ? 1 : 0,
+        ...commonConfig,
+      }),
+      Animated.timing(values.translate, {
+        toValue: show ? new Point(0, 0) : translateOrigin,
+        ...commonConfig,
+      }),
+      Animated.timing(values.scale, {
+        toValue: show ? 1 : 0,
+        ...commonConfig,
+      })
+    ]).start(doneCallback);
+  },
+  _getDefaultAnimatedStyles() {
+    // If there's a custom animation handler,
+    // we don't return the default animated styles
+    if (typeof this.props.startCustomAnimation !== 'undefined') {
+      return null;
+    }
+
+    var animatedValues = this.state.defaultAnimatedValues;
+
+    return {
+      backgroundStyle: {
+        opacity: animatedValues.fade,
+      },
+      arrowStyle: {
+        transform: [
+          {
+            scale: animatedValues.scale.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, 1],
+              extrapolate: 'clamp',
+            }),
+          }
+        ],
+      },
+      contentStyle: {
+        transform: [
+          {translateX: animatedValues.translate.x},
+          {translateY: animatedValues.translate.y},
+          {scale: animatedValues.scale},
+        ],
+      }
+    };
+  },
+  _getExtendedStyles() {
+    var background = [];
+    var popover = [];
+    var arrow = [];
+    var content = [];
+
+    [this._getDefaultAnimatedStyles(), this.props].forEach((source) => {
+      if (source) {
+        background.push(source.backgroundStyle);
+        popover.push(source.popoverStyle);
+        arrow.push(source.arrowStyle);
+        content.push(source.contentStyle);
+      }
+    });
+
+    return {
+      background,
+      popover,
+      arrow,
+      content,
+    }
+  },
+  render() {
     if (!this.props.isVisible && !this.state.isTransitioning) {
         return null;
     }
 
     var {popoverOrigin, placement} = this.state;
-    var arrowColor = flattenStyle(styles.content).backgroundColor;
+    var extendedStyles = this._getExtendedStyles();
+    var contentStyle = [styles.content, ...extendedStyles.content];
+    var arrowColor = flattenStyle(contentStyle).backgroundColor;
     var arrowColorStyle = this.getArrowColorStyle(arrowColor);
     var arrowDynamicStyle = this.getArrowDynamicStyle();
     var contentSizeAvailable = this.state.contentSize.width;
 
-    var backgroundAnimatedStyle = {
-      opacity: this.state.fade,
-    };
-
-    var popoverAnimatedStyle = {
-      transform: [
-        {translateX: this.state.translate.x},
-        {translateY: this.state.translate.y},
-        {scale: this.state.scale},
-      ],
-    };
-
-    var arrowAnimatedStyle = {
-      transform: [
-        {
-          scale: this.state.scale.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0, 1],
-            extrapolate: 'clamp',
-          }),
-        }, {
-          rotate: this.getArrowRotation(placement),
-        }
-      ],
-    }
+    // Special case, force the arrow rotation even if it was overriden
+    var arrowStyle = [styles.arrow, arrowDynamicStyle, arrowColorStyle, ...extendedStyles.arrow];
+    var arrowTransform = (flattenStyle(arrowStyle).transform || []).slice(0);
+    arrowTransform.unshift({rotate: this.getArrowRotation(placement)});
+    arrowStyle = [...arrowStyle, {transform: arrowTransform}];
 
     return (
       <TouchableWithoutFeedback onPress={this.props.onClose}>
         <View style={[styles.container, contentSizeAvailable && styles.containerVisible ]}>
-          <Animated.View style={[styles.background, backgroundAnimatedStyle /*, this.transitionStyles('background')*/]}/>
+          <Animated.View style={[styles.background, ...extendedStyles.background]}/>
           <Animated.View style={[styles.popover, {
             top: popoverOrigin.y,
             left: popoverOrigin.x,
-            } /*, this.transitionStyles('popover')*/]}>
-            <Animated.View style={[styles.arrow, arrowDynamicStyle, arrowColorStyle, arrowAnimatedStyle]}/>
-            <Animated.View ref='content' onLayout={this.measureContent} style={[styles.content, popoverAnimatedStyle]}>
+            }, ...extendedStyles.popover]}>
+            <Animated.View style={arrowStyle}/>
+            <Animated.View ref='content' onLayout={this.measureContent} style={contentStyle}>
               {this.props.children}
             </Animated.View>
           </Animated.View>
@@ -366,7 +363,7 @@ var Popover = React.createClass({
 });
 
 
-var DefaultStyles = StyleSheet.create({
+var styles = StyleSheet.create({
   container: {
     opacity: 0,
     top: 0,
