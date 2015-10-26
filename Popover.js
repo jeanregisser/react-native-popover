@@ -11,7 +11,7 @@ var {
   View
 } = React;
 var flattenStyle = require('react-native/Libraries/StyleSheet/flattenStyle');
-var Easing = require('react-native/Libraries/Animated/Easing');
+var Easing = require('react-native/Libraries/Animated/src/Easing');
 var noop = () => {};
 
 var {height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
