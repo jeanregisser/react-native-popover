@@ -38,7 +38,6 @@ var Popover = React.createClass({
   propTypes: {
     isVisible: PropTypes.bool,
     onClose: PropTypes.func,
-    backdropColor: PropTypes.string
   },
   getInitialState() {
     return {
