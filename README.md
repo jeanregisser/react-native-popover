@@ -19,7 +19,7 @@ npm i --save react-native-popover
 
 ## Usage
 
-```javascript
+```jsx
 'use strict';
 
 var React = require('react-native');
