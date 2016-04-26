@@ -8,10 +8,9 @@ var {
   Animated,
   Text,
   TouchableWithoutFeedback,
-  View
+  View,
+  Easing
 } = React;
-var flattenStyle = require('react-native/Libraries/StyleSheet/flattenStyle');
-var Easing = require('react-native/Libraries/Animated/src/Easing');
 var noop = () => {};
 
 var {height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
@@ -332,14 +331,14 @@ var Popover = React.createClass({
     var {popoverOrigin, placement} = this.state;
     var extendedStyles = this._getExtendedStyles();
     var contentStyle = [styles.content, ...extendedStyles.content];
-    var arrowColor = flattenStyle(contentStyle).backgroundColor;
+    var arrowColor = StyleSheet.flatten(contentStyle).backgroundColor;
     var arrowColorStyle = this.getArrowColorStyle(arrowColor);
     var arrowDynamicStyle = this.getArrowDynamicStyle();
     var contentSizeAvailable = this.state.contentSize.width;
 
     // Special case, force the arrow rotation even if it was overriden
     var arrowStyle = [styles.arrow, arrowDynamicStyle, arrowColorStyle, ...extendedStyles.arrow];
-    var arrowTransform = (flattenStyle(arrowStyle).transform || []).slice(0);
+    var arrowTransform = (StyleSheet.flatten(arrowStyle).transform || []).slice(0);
     arrowTransform.unshift({rotate: this.getArrowRotation(placement)});
     arrowStyle = [...arrowStyle, {transform: arrowTransform}];
 
