@@ -21,7 +21,7 @@ npm i --save react-native-popover
 ```jsx
 'use strict';
 
-var React = require('react-native');
+var React = require('react');
 var Popover = require('react-native-popover');
 var {
   AppRegistry,
@@ -29,7 +29,7 @@ var {
   Text,
   TouchableHighlight,
   View,
-} = React;
+} = require('react-native');
 
 var PopoverExample = React.createClass({
   getInitialState() {
