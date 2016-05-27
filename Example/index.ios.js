@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('react-native');
+var React = require('react');
 var Popover = require('../Popover');
 var {
   AppRegistry,
@@ -9,7 +9,7 @@ var {
   Text,
   TouchableHighlight,
   View,
-} = React;
+} = require('react-native');
 
 var PopoverExample = React.createClass({
   getInitialState() {

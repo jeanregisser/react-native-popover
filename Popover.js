@@ -1,8 +1,7 @@
 'use strict';
 
-var React = require('react-native');
-var {
-  PropTypes,
+import React, { PropTypes } from 'react';
+import {
   StyleSheet,
   Dimensions,
   Animated,
@@ -10,7 +9,8 @@ var {
   TouchableWithoutFeedback,
   View,
   Easing
-} = React;
+} from 'react-native';
+
 var noop = () => {};
 
 var {height: SCREEN_HEIGHT, width: SCREEN_WIDTH} = Dimensions.get('window');
