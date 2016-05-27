@@ -2,6 +2,7 @@
 
 [![npm version](http://img.shields.io/npm/v/react-native-popover.svg?style=flat-square)](https://npmjs.org/package/react-native-popover "View this project on npm")
 [![npm version](http://img.shields.io/npm/dm/react-native-popover.svg?style=flat-square)](https://npmjs.org/package/react-native-popover "View this project on npm")
+[![npm licence](http://img.shields.io/npm/l/react-native-popover.svg?style=flat-square)](https://npmjs.org/package/react-native-popover "View this project on npm")
 
 A `<Popover>` component for react-native. This is still very much a work
 in progress and only handles the simplest of cases, ideas and
