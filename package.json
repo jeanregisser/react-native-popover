@@ -20,7 +20,5 @@
     "type": "git",
     "url": "git@github.com:jeanregisser/react-native-popover.git"
   },
-  "peerDependencies": {
-    "react-native": ">=0.8.0"
   }
 }
